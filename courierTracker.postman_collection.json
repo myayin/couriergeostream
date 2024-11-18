@@ -1,0 +1,60 @@
+{
+	"info": {
+		"_postman_id": "c0a91597-0524-4ac5-8123-0e16bb503a4d",
+		"name": "courierTracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8145360"
+	},
+	"item": [
+		{
+			"name": "getCourier",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v0/courier/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v0",
+						"courier",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logCourier",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"courierId\" : 1,\r\n    \"coordinateDTO\": {\r\n        \"latitude\" : 40.9632463,\r\n        \"longitude\": 29.0630908\r\n\r\n    }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v0/courierDistance",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v0",
+						"courierDistance"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

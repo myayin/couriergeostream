@@ -1,0 +1,78 @@
+version: '0'
+
+services:
+  db:
+    image: postgis/postgis:latest
+    container_name: postgis-container
+    environment:
+      - POSTGRES_USER=courier_tracker_api
+      - POSTGRES_PASSWORD=courier_tracker_api
+      - POSTGRES_DB=courier_tracker_api
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+  app:
+    image: 'migros:latest'
+    build:
+      context: .
+    container_name: app
+    depends_on:
+      - db
+      - kafka-server-1
+    ports:
+      - "8080:8080"
+    networks:
+      - app-network
+    environment:
+      - POSTGRES_USER=courier_tracker_api
+      - POSTGRES_PASSWORD=courier_tracker_api
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/courier_tracker_api
+      - SPRING_DATASOURCE_USERNAME=courier_tracker_api
+      - SPRING_DATASOURCE_PASSWORD=courier_tracker_api
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka-server-1:9092
+
+
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - app-network
+
+
+  kafka-server-1:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-server-1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - app-network
+
+
+  manager:
+    image: sheepkiller/kafka-manager
+    ports:
+      - 9000:9000
+    environment:
+      ZK_HOSTS: zookeeper:2181
+    depends_on:
+      - zookeeper
+    networks:
+      - app-network
+networks:
+  app-network:
+   driver: bridge
